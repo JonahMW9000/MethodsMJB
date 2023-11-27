@@ -1,57 +1,59 @@
 import sqlite3
+from tabulate import tabulate
 
 class Inventory:
     def __init__(self, database_name="MethodsFinalProject.db", table_name="Inventory"):
-        self.databadeName = database_name
-        self.tableName = table_name
+        self.database_name = database_name
+        self.table_name = table_name
 
-    def set_database_table(self, databaseName, tableName):
-        self.databaseName = databaseName
-        self.tableName = tableName
+    def set_database_table(self, database_name, table_name):
+        self.database_name = database_name
+        self.table_name = table_name
 
     def view_inventory(self):
-        connection = sqlite3.connect(self.databaseName)
-        cursor = connection.cursor()
+        with sqlite3.connect(self.database_name) as connection:
+            cursor = connection.cursor()
+            cursor.execute(f"SELECT * FROM Inventory")
+            items = cursor.fetchall()
 
-        cursor.execute(f"SELECT * FROM {self.tableName}")
-        items = cursor.fetchall()
-        for item in items:
-            print(item)
+            if not items:
+                print("No items in the inventory.")
+                return
 
-        connection.close()
+            headers = [description[0] for description in cursor.description]
+            table_data = [list(map(str, item)) for item in items]
+            print(tabulate(table_data, headers=headers, tablefmt="grid"))
 
     def search_inventory(self, title):
-        connection = sqlite3.connect(self.databaseName)
-        cursor = connection.cursor()
+        with sqlite3.connect(self.database_name) as connection:
+            cursor = connection.cursor()
+            cursor.execute(f"SELECT * FROM Inventory WHERE title=?", (title,))
+            results = cursor.fetchall()
 
-        cursor.execute(f"SELECT * FROM {self.tableName} WHERE title=?", (title,))
-        results = cursor.fetchll()
+            if results:
+                for result in results:
+                    print(result)
+            else:
+                print(f"No results found for title: {title}")
 
-        if results:
-            for results in results:
-                print(results)
-        else:
-            print(f"No results found for title: {title}")
+    def decrease_stock(self, isbn):
+        with sqlite3.connect(self.database_name) as connection:
+            cursor = connection.cursor()
 
-        connection.close()
-    
-    def decrease_stock(self, ISBN):
-        connection = sqlite3.connect(self.databaseName)
-        cursor = connection.cursor()
-
-        cursor.execute(f"UPDATE {self.tableName} SET stock = stock - 1 WHERE ISBN=?", (ISBN,))
-
-        connection.commit()
-        connection.close()
+            try:
+                cursor.execute(f"UPDATE Inventory SET stock = stock - 1 WHERE ISBN=?", (isbn,))
+                connection.commit()
+            except sqlite3.Error as e:
+                print(f"Error updating stock: {e}")
 
     def get_database_name(self):
-        return self.databaseName
-    
-    def set_database_name(self, databaseName):
-        self.databaseName = databaseName
+        return self.database_name
+
+    def set_database_name(self, database_name):
+        self.database_name = database_name
 
     def get_table_name(self):
-        return self.tableName
-    
-    def set_table_name(self, tableName):
-        self.tableName = tableName
+        return self.table_name
+
+    def set_table_name(self, table_name):
+        self.table_name = table_name
