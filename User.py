@@ -19,9 +19,10 @@ class User:
         password = input("Enter your password: ")
 
         # Validate login credentials
-        if self.validate_login(email, password):
+        user_id = self.validate_login(email, password)
+        if user_id:
             self.logged_in = True
-            self.user_id = email  # Assuming email is the user ID
+            self.user_id = user_id
             print("Login successful.")
             return True
         else:
@@ -31,8 +32,11 @@ class User:
     def validate_login(self, email, password):
         with sqlite3.connect(self.database_name) as connection:
             cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM {self.table_name} WHERE Email=? AND Password=?", (email, password))
-            return cursor.fetchone() is not None
+            cursor.execute(f"SELECT UserID FROM {self.table_name} WHERE Email=? AND Password=?", (email, password))
+            result = cursor.fetchone()
+
+            # If the result is not None, return the user ID; otherwise, return None
+            return result[0] if result else None
 
     def logout(self):
         self.user_id = ""
