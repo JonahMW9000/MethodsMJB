@@ -1,7 +1,7 @@
 import User
 import Inventory
 import Cart
-
+import sqlite3
 
 def cartMenu():
    while True:
@@ -17,18 +17,21 @@ def cartMenu():
        break
     elif answer4=="2":
       viewCa = Cart.Cart()
-      #print(viewCa.view_cart()) 
+      viewCa.view_cart()
     elif answer4=="3":
-      print("This adds items to carts")
+      addCa = Cart.Cart()
+      isbnCa = input("Enter the ISBN of the item you would like to add to your cart: ")
+      addCa.add_to_cart(isbnCa)
     elif answer4=="4":
-      print("This removes an item from cart")
+      removeCa = Cart.Cart()
+      isbnRe = input("Enter the ISBN of the item you would like to remove from your cart: ")
+      removeCa.remove_from_cart(isbnRe)
     elif answer4=="5":
-      print("this checks out user")
+      checkOut = Cart.Cart()
+      checkOut.check_out()
 
     elif answer4 !="1" or "2" or "3" or "4" or "5":
       print("\n Not Valid Choice Try again") 
-
-
 
 
 def inventoryMenu():
@@ -54,7 +57,6 @@ def inventoryMenu():
 
 
 answer1 = (input)
-
 print("Welcome to the M&T E-Commerce Store!")
 #before login loop menu
 ans=True
@@ -66,10 +68,14 @@ while ans:
     """)
     ans=answer1("Please Select an Option: ") 
     if ans=="1": 
-       print("call Login function from User Class")
-       break
+       logUin = User.User()
+       print("\n")
+       logUin.login()
+       #break
     elif ans=="2":
-      print("call create account function from User class") 
+      print("\n")
+      creatAcc = User.User()
+      creatAcc.create_account()
     elif ans=="3":
       quit()
     elif ans !="1" or "2" or "3":
@@ -88,18 +94,15 @@ while True:
     if answer2=="1": 
        quit()
 
-
     elif answer2=="2":
       viewACI = User.User()
-      #print(viewACI.viewAccountInformation) 
+      viewACI.view_account_information
 
     elif answer2=="3":
-      print("fix this")
       inventoryMenu()
 
     elif answer2=="4":
-      print("fix this")
-      cartMenu
+      cartMenu()
 
     elif answer2 !="1" or "2" or "3" or "4":
       print("\n Not Valid Choice Try again")
