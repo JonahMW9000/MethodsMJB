@@ -71,7 +71,7 @@ while ans:
        logUin = User.User()
        print("\n")
        logUin.login()
-       #break
+       break
     elif ans=="2":
       print("\n")
       creatAcc = User.User()
