@@ -78,8 +78,14 @@ class User:
         # Database interaction to create a new account
         with sqlite3.connect(self.database_name) as connection:
             cursor = connection.cursor()
-            cursor.execute(f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                           (email, password, first_name, last_name, address, city, state, zip_code, payment))
+            cursor.execute(f"SELECT MAX(UserID) FROM {self.table_name}")
+            result = cursor.fetchone()
+            max_user_id = result[0] if result[0] else 0
+            new_user_id = max_user_id + 1
+
+            # Database interaction to create a new account
+            cursor.execute(f"INSERT INTO {self.table_name} VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                           (new_user_id, email, password, first_name, last_name, address, city, state, zip_code, payment))
             connection.commit()
             print(f"Account created for user {email}.")
 
