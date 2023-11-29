@@ -12,7 +12,9 @@ class Cart:
     def view_cart(self, user_id):
         with sqlite3.connect(self.database_name) as connection:
             cursor = connection.cursor()
-            cursor.execute(f"SELECT * FROM {self.table_name} WHERE UserID=?", (user_id,))
+
+            # Use a JOIN statement to retrieve information from both Cart and Inventory tables
+            cursor.execute(f'SELECT Cart.ISBN, Title, Author, Genre, Pages, "Release Date", Quantity FROM {self.table_name} INNER JOIN Inventory ON Cart.ISBN = Inventory.ISBN WHERE UserID=?', (user_id,))
             cart_items = cursor.fetchall()
 
             if not cart_items:
@@ -21,16 +23,25 @@ class Cart:
 
             print("Items in your cart:")
             for item in cart_items:
-                user_id, isbn, quantity = item
-                print(f"User ID: {user_id}, ISBN: {isbn}, Quantity: {quantity}")
+                # item[0] is the ISBN, and the other elements are from the Inventory table
+                print(f"ISBN: {item[0]}, Title: {item[1]}, Author: {item[2]}, Genre: {item[3]}, Pages: {item[4]}, Release Date: {item[5]}, Quantity: {item[6]}")
 
     def add_to_cart(self, user_id, isbn):
         with sqlite3.connect(self.database_name) as connection:
             cursor = connection.cursor()
 
+            # Check if the book with the specified ISBN exists in the Inventory table
+            cursor.execute("SELECT * FROM Inventory WHERE ISBN=?", (isbn,))
+            book_data = cursor.fetchone()
+
+            if not book_data:
+                print(f"Book with ISBN {isbn} not found in the inventory.")
+                return
+
             try:
+                # Book exists in the Inventory, so insert it into the Cart
                 cursor.execute(f"INSERT INTO {self.table_name} (UserID, ISBN, Quantity) VALUES (?, ?, 1)",
-                               (user_id, isbn))
+                            (user_id, isbn))
                 connection.commit()
                 print(f"Book with ISBN {isbn} added to your cart.")
             except sqlite3.Error as e:
