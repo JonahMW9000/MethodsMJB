@@ -9,7 +9,7 @@ def mainMenu():
     print ("""
     1. Log Out
     2. View Account Information
-    3. Inventory Informatoin
+    3. Inventory Information
     4. Cart Information
     """)
     answer2 = input("Please Select an Option: ") 
