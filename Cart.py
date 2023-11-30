@@ -51,7 +51,16 @@ class Cart:
         with sqlite3.connect(self.database_name) as connection:
             cursor = connection.cursor()
 
+            # Check if the book with the specified ISBN exists in the Cart
+            cursor.execute(f"SELECT * FROM {self.table_name} WHERE UserID=? AND ISBN=?", (user_id, isbn))
+            book_data = cursor.fetchone()
+
+            if not book_data:
+                print(f"Book with ISBN {isbn} not found in your cart.")
+                return
+
             try:
+                # Book exists in the Cart, so remove it from the Cart
                 cursor.execute(f"DELETE FROM {self.table_name} WHERE UserID=? AND ISBN=?", (user_id, isbn))
                 connection.commit()
                 print(f"Book with ISBN {isbn} removed from your cart.")
